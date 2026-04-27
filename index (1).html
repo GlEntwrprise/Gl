@@ -1,202 +1,155 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Snake</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tropa do Abílio</title>
 
-<style>
-  body {
-    background: #111;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    text-align: center;
-  }
+  <!-- Fonte bonita -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
-  canvas {
-    display: block;
-    margin: 20px auto;
-    border: 2px solid #444;
-  }
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #fff0f5;
+      color: #333;
+    }
 
-  img {
-    margin-top: 20px;
-    border-radius: 8px;
-  }
-</style>
+    header {
+      text-align: center;
+      background: linear-gradient(135deg, #0B20A9, #4FAD08);
+      padding: 40px 20px;
+      color: white;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 700;
+    }
+
+    header p {
+      margin-top: 5px;
+      font-weight: 300;
+    }
+
+    .kits {
+      padding: 30px;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 20px;
+      max-width: 320px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 15px;
+    }
+
+    .card h3 {
+      color: #ff4d88;
+      margin-top: 10px;
+    }
+
+    .preco {
+      display: block;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 10px 0;
+    }
+
+    .botao {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #ff4d88;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .botao:hover {
+      background: #e6005c;
+    }
+
+    .destaque {
+      border: 2px solid #ff4d88;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .whatsapp {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 15px 25px;
+      background: #25D366;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+    }
+
+    .insta {
+      margin-top: 15px;
+    }
+
+    .insta a {
+      color: #ff4d88;
+      text-decoration: none;
+    }
+
+    .direitos {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #777;
+    }
+  </style>
 </head>
-
 <body>
 
-<h1>Snake</h1>
+<header>
+  <h1>TDA</h1>
+  <p>Venha com a tropa do abilio</p>
+</header>
 
-<img src="https://cdn.discordapp.com/attachments/1498423400077463743/1498423615941513319/20260414_113021.jpg" alt="Farmando Aura" width="300">
+<section class="kits">
+  <h2>O Abílio é um cara tranquilo e inteligente,  seja como ele, peça conselhos com os contatos abaixo</h2>
 
-<canvas id="gc" width="400" height="400"></canvas>
+    </a>
+  </div>
 
-<script>
-var Snake = (function () {
+</section>
 
-  var fixedTail = true;
-  var intervalID;
+<footer>
+  <a href="https://wa.me/558592888250?text=Olá%2C%20tenho%20interesse%20nos%20kits%20pegue%20e%20monte" class="whatsapp">
+    Fale no WhatsApp
+  </a>
 
-  var tileCount = 10;
-  var gridSize = 400/tileCount;
+  <div class="insta">
+    Instagram:
+    <a href="https://instagram.com/e.abilio" target="_blank">
+      Abílio Lenda
+    </a>
+  </div>
 
-  const INITIAL_PLAYER = { x: Math.floor(tileCount / 2), y: Math.floor(tileCount / 2) };
-  const INITIAL_TAIL = 3;
-
-  var velocity = { x:0, y:0 };
-  var player = { x: INITIAL_PLAYER.x, y: INITIAL_PLAYER.y };
-
-  var walls = false;
-  var fruit = { x:1, y:1 };
-
-  var trail = [];
-  var tail = INITIAL_TAIL;
-
-  var points = 0;
-  var pointsMax = 0;
-
-  var ActionEnum = { 'none':0, 'up':1, 'down':2, 'left':3, 'right':4 };
-  Object.freeze(ActionEnum);
-  var lastAction = ActionEnum.none;
-
-  var canv, ctx;
-
-  function setup () {
-    canv = document.getElementById('gc');
-    ctx = canv.getContext('2d');
-    game.reset();
-  }
-
-  var game = {
-
-    reset: function () {
-      ctx.fillStyle = 'grey';
-      ctx.fillRect(0, 0, canv.width, canv.height);
-
-      tail = INITIAL_TAIL;
-      points = 0;
-      velocity.x = 0;
-      velocity.y = 0;
-      player.x = INITIAL_PLAYER.x;
-      player.y = INITIAL_PLAYER.y;
-
-      lastAction = ActionEnum.none;
-
-      trail = [];
-      trail.push({ x: player.x, y: player.y });
-
-      game.randomFruit();
-    },
-
-    action: {
-      up: function () {
-        if (lastAction != ActionEnum.down){
-          velocity.x = 0;
-          velocity.y = -1;
-        }
-      },
-      down: function () {
-        if (lastAction != ActionEnum.up){
-          velocity.x = 0;
-          velocity.y = 1;
-        }
-      },
-      left: function () {
-        if (lastAction != ActionEnum.right){
-          velocity.x = -1;
-          velocity.y = 0;
-        }
-      },
-      right: function () {
-        if (lastAction != ActionEnum.left){
-          velocity.x = 1;
-          velocity.y = 0;
-        }
-      }
-    },
-
-    randomFruit: function () {
-      fruit.x = Math.floor(Math.random() * tileCount);
-      fruit.y = Math.floor(Math.random() * tileCount);
-    },
-
-    loop: function () {
-
-      player.x += velocity.x;
-      player.y += velocity.y;
-
-      if (velocity.x == 0 && velocity.y == -1) lastAction = ActionEnum.up;
-      if (velocity.x == 0 && velocity.y == 1) lastAction = ActionEnum.down;
-      if (velocity.x == -1 && velocity.y == 0) lastAction = ActionEnum.left;
-      if (velocity.x == 1 && velocity.y == 0) lastAction = ActionEnum.right;
-
-      ctx.fillStyle = 'rgba(40,40,40,0.9)';
-      ctx.fillRect(0,0,canv.width,canv.height);
-
-      if(player.x < 0) player.x = tileCount-1;
-      if(player.x >= tileCount) player.x = 0;
-      if(player.y < 0) player.y = tileCount-1;
-      if(player.y >= tileCount) player.y = 0;
-
-      var stopped = velocity.x == 0 && velocity.y == 0;
-
-      if (!stopped){
-        trail.push({x:player.x, y:player.y});
-        while(trail.length > tail) trail.shift();
-      }
-
-      ctx.fillStyle = 'green';
-      for(var i=0; i<trail.length-1; i++) {
-        ctx.fillRect(trail[i].x * gridSize+1, trail[i].y * gridSize+1, gridSize-2, gridSize-2);
-
-        if (!stopped && trail[i].x == player.x && trail[i].y == player.y){
-          game.reset();
-        }
-      }
-
-      ctx.fillStyle = 'lime';
-      ctx.fillRect(trail[trail.length-1].x * gridSize+1, trail[trail.length-1].y * gridSize+1, gridSize-2, gridSize-2);
-
-      if (player.x == fruit.x && player.y == fruit.y) {
-        tail++;
-        points++;
-        if(points > pointsMax) pointsMax = points;
-        game.randomFruit();
-      }
-
-      ctx.fillStyle = 'red';
-      ctx.fillRect(fruit.x * gridSize+1, fruit.y * gridSize+1, gridSize-2, gridSize-2);
-
-      ctx.fillStyle = 'white';
-      ctx.font = "bold 16px Arial";
-      ctx.fillText("Points: " + points, 280, 30);
-      ctx.fillText("Top: " + pointsMax, 280, 50);
-    }
-  };
-
-  function keyPush (evt) {
-    switch(evt.keyCode) {
-      case 37: game.action.left(); break;
-      case 38: game.action.up(); break;
-      case 39: game.action.right(); break;
-      case 40: game.action.down(); break;
-    }
-  }
-
-  return {
-    start: function (fps = 10) {
-      window.onload = setup;
-      intervalID = setInterval(game.loop, 1000 / fps);
-      document.addEventListener('keydown', keyPush);
-    }
-  };
-
-})();
-
-Snake.start();
-</script>
+  <div class="direitos">
+    © 2026 Abilio - Todos os direitos reservados
+  </div>
+</footer>
 
 </body>
 </html>
