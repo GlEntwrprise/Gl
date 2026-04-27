@@ -1,59 +1,202 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Decors</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Snake</title>
+
+<style>
+  body {
+    background: #111;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+
+  canvas {
+    display: block;
+    margin: 20px auto;
+    border: 2px solid #444;
+  }
+
+  img {
+    margin-top: 20px;
+    border-radius: 8px;
+  }
+</style>
 </head>
+
 <body>
 
-<header>
-  <h1>Mi Decors</h1>
-  <p>Kits Pegue e Monte para sua Mini Festa</p>
-</header>
+<h1>Snake</h1>
 
-<section class="kits">
-  <h2>Nossos Kits</h2>
+<img src="https://cdn.discordapp.com/attachments/1498423400077463743/1498423615941513319/20260414_113021.jpg" alt="Farmando Aura" width="300">
 
-  <div class="card">
-    <img src="https://cdn.discordapp.com/attachments/1443369107973083357/1488520923849031804/IMG-20260331-WA0087.jpg" alt="Kit Básico">
-    <h3>Kit Básico</h3>
-    <p>Painel<br>Bandejas<br>Jarro</p>
-    <span class="preco">R$ 30,00</span>
-    <a href="https://wa.me/5585991745998?text=Olá%2C%20tenho%20interesse%20nos%20kits%20pegue%20e%20monte" class="botao">Comprar</a>
-  </div>
+<canvas id="gc" width="400" height="400"></canvas>
 
-  <div class="card">
-    <img src="https://cdn.discordapp.com/attachments/1443369107973083357/1488520925136556052/IMG-20260331-WA0084.jpg" alt="Kit Intermediário">
-    <h3>Kit Intermediário</h3>
-    <p>Painel<br>Bandejas<br>Jarro<br>Mesa<br>Tapete</p>
-    <span class="preco">R$ 50,00</span>
-    <a href="https://wa.me/5585991745998?text=Olá%2C%20tenho%20interesse%20nos%20kits%20pegue%20e%20monte" class="botao">Comprar</a>
-  </div>
+<script>
+var Snake = (function () {
 
-  <div class="card">
-    <img src="https://cdn.discordapp.com/attachments/1443369107973083357/1488520924553543680/IMG-20260331-WA0086.jpg" alt="Kit Completo">
-    <h3>Kit Completo</h3>
-    <p>Painel<br>Bandejas<br>Jarro<br>Mesa<br>Tapete<br>Cavalete</p>
-    <span class="preco">R$ 70,00</span>
-    <a href="https://wa.me/5585991745998?text=Olá%2C%20tenho%20interesse%20nos%20kits%20pegue%20e%20monte" class="botao">Comprar</a>
-  </div>
+  var fixedTail = true;
+  var intervalID;
 
-</section>
+  var tileCount = 10;
+  var gridSize = 400/tileCount;
 
-<footer>
-  <a href="https://wa.me/5585991745998?text=Olá%2C%20tenho%20interesse%20nos%20kits%20pegue%20e%20monte" class="whatsapp">
-    Fale no WhatsApp
-  </a>
+  const INITIAL_PLAYER = { x: Math.floor(tileCount / 2), y: Math.floor(tileCount / 2) };
+  const INITIAL_TAIL = 3;
 
-  <p style="margin-top: 15px;">
-    Instagram: 
-    <a href="https://instagram.com/pegueemonte0520" target="_blank">
-      @pegueemonte0520
-    </a>
-  </p>
-</footer>
+  var velocity = { x:0, y:0 };
+  var player = { x: INITIAL_PLAYER.x, y: INITIAL_PLAYER.y };
+
+  var walls = false;
+  var fruit = { x:1, y:1 };
+
+  var trail = [];
+  var tail = INITIAL_TAIL;
+
+  var points = 0;
+  var pointsMax = 0;
+
+  var ActionEnum = { 'none':0, 'up':1, 'down':2, 'left':3, 'right':4 };
+  Object.freeze(ActionEnum);
+  var lastAction = ActionEnum.none;
+
+  var canv, ctx;
+
+  function setup () {
+    canv = document.getElementById('gc');
+    ctx = canv.getContext('2d');
+    game.reset();
+  }
+
+  var game = {
+
+    reset: function () {
+      ctx.fillStyle = 'grey';
+      ctx.fillRect(0, 0, canv.width, canv.height);
+
+      tail = INITIAL_TAIL;
+      points = 0;
+      velocity.x = 0;
+      velocity.y = 0;
+      player.x = INITIAL_PLAYER.x;
+      player.y = INITIAL_PLAYER.y;
+
+      lastAction = ActionEnum.none;
+
+      trail = [];
+      trail.push({ x: player.x, y: player.y });
+
+      game.randomFruit();
+    },
+
+    action: {
+      up: function () {
+        if (lastAction != ActionEnum.down){
+          velocity.x = 0;
+          velocity.y = -1;
+        }
+      },
+      down: function () {
+        if (lastAction != ActionEnum.up){
+          velocity.x = 0;
+          velocity.y = 1;
+        }
+      },
+      left: function () {
+        if (lastAction != ActionEnum.right){
+          velocity.x = -1;
+          velocity.y = 0;
+        }
+      },
+      right: function () {
+        if (lastAction != ActionEnum.left){
+          velocity.x = 1;
+          velocity.y = 0;
+        }
+      }
+    },
+
+    randomFruit: function () {
+      fruit.x = Math.floor(Math.random() * tileCount);
+      fruit.y = Math.floor(Math.random() * tileCount);
+    },
+
+    loop: function () {
+
+      player.x += velocity.x;
+      player.y += velocity.y;
+
+      if (velocity.x == 0 && velocity.y == -1) lastAction = ActionEnum.up;
+      if (velocity.x == 0 && velocity.y == 1) lastAction = ActionEnum.down;
+      if (velocity.x == -1 && velocity.y == 0) lastAction = ActionEnum.left;
+      if (velocity.x == 1 && velocity.y == 0) lastAction = ActionEnum.right;
+
+      ctx.fillStyle = 'rgba(40,40,40,0.9)';
+      ctx.fillRect(0,0,canv.width,canv.height);
+
+      if(player.x < 0) player.x = tileCount-1;
+      if(player.x >= tileCount) player.x = 0;
+      if(player.y < 0) player.y = tileCount-1;
+      if(player.y >= tileCount) player.y = 0;
+
+      var stopped = velocity.x == 0 && velocity.y == 0;
+
+      if (!stopped){
+        trail.push({x:player.x, y:player.y});
+        while(trail.length > tail) trail.shift();
+      }
+
+      ctx.fillStyle = 'green';
+      for(var i=0; i<trail.length-1; i++) {
+        ctx.fillRect(trail[i].x * gridSize+1, trail[i].y * gridSize+1, gridSize-2, gridSize-2);
+
+        if (!stopped && trail[i].x == player.x && trail[i].y == player.y){
+          game.reset();
+        }
+      }
+
+      ctx.fillStyle = 'lime';
+      ctx.fillRect(trail[trail.length-1].x * gridSize+1, trail[trail.length-1].y * gridSize+1, gridSize-2, gridSize-2);
+
+      if (player.x == fruit.x && player.y == fruit.y) {
+        tail++;
+        points++;
+        if(points > pointsMax) pointsMax = points;
+        game.randomFruit();
+      }
+
+      ctx.fillStyle = 'red';
+      ctx.fillRect(fruit.x * gridSize+1, fruit.y * gridSize+1, gridSize-2, gridSize-2);
+
+      ctx.fillStyle = 'white';
+      ctx.font = "bold 16px Arial";
+      ctx.fillText("Points: " + points, 280, 30);
+      ctx.fillText("Top: " + pointsMax, 280, 50);
+    }
+  };
+
+  function keyPush (evt) {
+    switch(evt.keyCode) {
+      case 37: game.action.left(); break;
+      case 38: game.action.up(); break;
+      case 39: game.action.right(); break;
+      case 40: game.action.down(); break;
+    }
+  }
+
+  return {
+    start: function (fps = 10) {
+      window.onload = setup;
+      intervalID = setInterval(game.loop, 1000 / fps);
+      document.addEventListener('keydown', keyPush);
+    }
+  };
+
+})();
+
+Snake.start();
+</script>
 
 </body>
 </html>
