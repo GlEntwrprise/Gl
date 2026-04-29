@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tropa do Abílio</title>
 
-  <!-- Fonte bonita -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
   <style>
@@ -14,6 +13,7 @@
       font-family: 'Poppins', sans-serif;
       background: #fff0f5;
       color: #333;
+      overflow: hidden;
     }
 
     header {
@@ -37,55 +37,6 @@
     .kits {
       padding: 30px;
       text-align: center;
-    }
-
-    .card {
-      background: white;
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 20px;
-      max-width: 320px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      transition: 0.3s;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-    }
-
-    .card img {
-      width: 100%;
-      border-radius: 15px;
-    }
-
-    .card h3 {
-      color: #ff4d88;
-      margin-top: 10px;
-    }
-
-    .preco {
-      display: block;
-      font-size: 24px;
-      font-weight: 700;
-      margin: 10px 0;
-    }
-
-    .botao {
-      display: inline-block;
-      padding: 12px 20px;
-      background: #ff4d88;
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      transition: 0.3s;
-    }
-
-    .botao:hover {
-      background: #e6005c;
-    }
-
-    .destaque {
-      border: 2px solid #ff4d88;
     }
 
     footer {
@@ -117,6 +68,14 @@
       font-size: 12px;
       color: #777;
     }
+
+    /* EMOJIS */
+    .emoji {
+      position: fixed;
+      font-size: 30px;
+      pointer-events: none;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -129,10 +88,9 @@
 <section class="kits">
   <h2>O Abílio é um cara tranquilo e inteligente, seja como ele, peça conselhos com os contatos abaixo</h2>
 
-  <img src="https://cdn.discordapp.com/attachments/1498423400077463743/1498423615941513319/20260414_113021.jpg?ex=69f11b3d&is=69efc9bd&hm=672589a415dc78dce18e46dd9954d7e932ed52e572efe508f42d6a239ef6e3ee" 
+  <img src="https://cdn.discordapp.com/attachments/1498423400077463743/1498423615941513319/20260414_113021.jpg" 
        alt="Foto do Abílio" 
        style="max-width:300px; border-radius:15px; margin-top:20px;">
-
 </section>
 
 <footer>
@@ -151,6 +109,44 @@
     © 2026 Abilio - Todos os direitos reservados
   </div>
 </footer>
+
+<script>
+  const emojis = ["🍌", "🥒", "🍆"];
+
+  function criarEmoji() {
+    const el = document.createElement("div");
+    el.className = "emoji";
+    el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+
+    document.body.appendChild(el);
+
+    let x = Math.random() * window.innerWidth;
+    let y = Math.random() * window.innerHeight;
+
+    let dx = (Math.random() - 0.5) * 4;
+    let dy = (Math.random() - 0.5) * 4;
+
+    function mover() {
+      x += dx;
+      y += dy;
+
+      if (x < 0 || x > window.innerWidth) dx *= -1;
+      if (y < 0 || y > window.innerHeight) dy *= -1;
+
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+
+      requestAnimationFrame(mover);
+    }
+
+    mover();
+  }
+
+  // quantidade de emojis na tela
+  for (let i = 0; i < 10; i++) {
+    criarEmoji();
+  }
+</script>
 
 </body>
 </html>
